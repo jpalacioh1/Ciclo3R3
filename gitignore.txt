@@ -1,0 +1,7 @@
+*.key
+*.key.pub
+ssh-key-2021-10-17.key
+.key
+ssh*
+.zip
+*.zip
