@@ -1,0 +1,86 @@
+package com.example.demo;
+
+import java.util.List;
+import java.util.Optional;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+@Service
+public class ServiciosReservaciones {
+
+    /**
+     * Servicio para ejecucion de metodos crud
+     */
+    @Autowired
+    private RepositorioReservaciones metodosCrud;  
+    public List<Reservaciones> getAll() {
+        return metodosCrud.getAll();
+    }
+
+    /**
+     * Servicio para el comando get en la tabla Reservation
+     * @param reservationId
+     * @return 
+     */
+    public Optional<Reservaciones> getReservation(int reservationId) {
+        return metodosCrud.getReservation(reservationId);
+    }
+
+    /**
+     * Servicio para el comando save:guardar en la tabla Reservation
+     * @param reservation
+     * @return 
+     */
+    public Reservaciones save(Reservaciones reservation) {
+        if (reservation.getIdReservation() == null) {
+            return metodosCrud.save(reservation);
+        } else {
+            Optional<Reservaciones> eee = metodosCrud.getReservation(reservation.getIdReservation());
+            if (eee.isEmpty()) {
+                return metodosCrud.save(reservation);
+            } else {
+                return reservation;
+            }
+        }
+    }
+/**
+ * Servicio para el comando update de la tabla Reservation
+ * @param reservation
+ * @return 
+ */
+    public Reservaciones update(Reservaciones reservation) {
+        if (reservation.getIdReservation() != null) {
+            Optional<Reservaciones> eee = metodosCrud.getReservation(reservation.getIdReservation());
+            if (!eee.isEmpty()) {
+
+                if (reservation.getStartDate() != null) {
+                    eee.get().setStartDate(reservation.getStartDate());
+                }
+                if (reservation.getDevolutionDate() != null) {
+                    eee.get().setDevolutionDate(reservation.getDevolutionDate());
+                }
+                if (reservation.getStatus() != null) {
+                    eee.get().setStatus(reservation.getStatus());
+                }
+                metodosCrud.save(eee.get());
+                return eee.get();
+            } else {
+                return reservation;
+            }
+        } else {
+            return reservation;
+        }
+    }
+/**
+ * Servicio para el comando delete de la tabla Reservation
+ * @param reservationId
+ * @return 
+ */
+    public boolean deleteReservation(int reservationId) {
+        Boolean aBoolean = getReservation(reservationId).map(reservation -> {
+            metodosCrud.delete(reservation);
+            return true;
+        }).orElse(false);
+        return aBoolean;
+    }
+}
